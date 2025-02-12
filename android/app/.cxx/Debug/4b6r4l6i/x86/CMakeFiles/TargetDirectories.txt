@@ -1,0 +1,2 @@
+C:/Users/Jithin Reji/Desktop/new folder/programming/voxcue_app/android/app/.cxx/Debug/4b6r4l6i/x86/CMakeFiles/edit_cache.dir
+C:/Users/Jithin Reji/Desktop/new folder/programming/voxcue_app/android/app/.cxx/Debug/4b6r4l6i/x86/CMakeFiles/rebuild_cache.dir
