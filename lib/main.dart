@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; 
 
 void main() {
   runApp(const MyApp());
@@ -62,20 +63,22 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextField(
-                controller: _textController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter a to-do item',
+              RawKeyboardListener(
+                focusNode: FocusNode(),
+                onKey: (event) {
+                  if (event.isKeyPressed(LogicalKeyboardKey.enter) && !event.isShiftPressed) {
+                    _addTodoItem();
+                  }
+                },
+                child: TextField(
+                  controller: _textController,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter a to-do item',
+                  ),
+                  textInputAction: TextInputAction.newline,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
                 ),
-                textInputAction: TextInputAction.newline,
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                onSubmitted: (value) {
-                  _addTodoItem();
-                },
-                onEditingComplete: () {
-                  _addTodoItem();
-                },
               ),
               const SizedBox(height: 10),
               ElevatedButton(
