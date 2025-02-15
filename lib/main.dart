@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,70 +31,91 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final List<Map<String, dynamic>> _todoList = [];
+  final TextEditingController _textController = TextEditingController();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void _addTodoItem() {
+    if (_textController.text.isNotEmpty) {
+      setState(() {
+        _todoList.add({'text': _textController.text, 'completed': false});
+        _textController.clear();
+      });
+    }
   }
 
-  void _decrementCounter() {
+  void _toggleTodoItem(int index) {
     setState(() {
-      _counter--;
+      _todoList[index]['completed'] = !_todoList[index]['completed'];
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
-        ),
-        body: Center(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: FractionallySizedBox(
+          heightFactor: 0.33,
+          widthFactor: 0.9,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text(
-                'You have pushed the button this many times:',
+              RawKeyboardListener(
+                focusNode: FocusNode(),
+                onKey: (event) {
+                  if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
+                      !event.isShiftPressed) {
+                    _addTodoItem();
+                  }
+                },
+                child: TextField(
+                  controller: _textController,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter a to-do item',
+                  ),
+                  textInputAction: TextInputAction.newline,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                ),
               ),
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.headlineMedium,
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _addTodoItem,
+                child: const Text('Add To-Do'),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _todoList.length,
+                  itemBuilder: (context, index) {
+                    return CheckboxListTile(
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text(
+                        _todoList[index]['text'],
+                        style: TextStyle(
+                          decoration: _todoList[index]['completed']
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                          color: _todoList[index]['completed']
+                              ? Colors.black.withOpacity(0.5)
+                              : Colors.black,
+                        ),
+                      ),
+                      value: _todoList[index]['completed'],
+                      onChanged: (bool? value) {
+                        _toggleTodoItem(index);
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
         ),
-        floatingActionButton: Container(
-          height: 200,
-          // padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              FloatingActionButton(
-                onPressed: _incrementCounter,
-                tooltip: 'Increment',
-                child: const Icon(Icons.add),
-              ),
-              FloatingActionButton(
-                onPressed: _decrementCounter,
-                tooltip: 'Decrement',
-                child: const Icon(Icons.minimize),
-              ),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 }
