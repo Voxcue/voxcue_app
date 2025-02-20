@@ -1,115 +1,128 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+class HomePage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final List<Map<String, dynamic>> _todoList = [];
-  final TextEditingController _textController = TextEditingController();
+class _HomePageState extends State<HomePage> {
+  final TextEditingController _chatController = TextEditingController();
+  final List<String> _chatMessages = [];
+  final List<String> _todoItems = List.generate(
+      20, (index) => "Task ${index + 1}"); // Simulating large data
 
-  void _addTodoItem() {
-    if (_textController.text.isNotEmpty) {
+  void _sendMessage() {
+    if (_chatController.text.trim().isNotEmpty) {
       setState(() {
-        _todoList.add({'text': _textController.text, 'completed': false});
-        _textController.clear();
+        _chatMessages.add("User: ${_chatController.text}");
+        _chatMessages.add("AI: This is a sample response.");
       });
+      _chatController.clear();
     }
-  }
-
-  void _toggleTodoItem(int index) {
-    setState(() {
-      _todoList[index]['completed'] = !_todoList[index]['completed'];
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: FractionallySizedBox(
-          heightFactor: 0.33,
-          widthFactor: 0.9,
+      appBar: AppBar(title: Text('VOXCUE')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          // Makes whole page scrollable
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              RawKeyboardListener(
-                focusNode: FocusNode(),
-                onKey: (event) {
-                  if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
-                      !event.isShiftPressed) {
-                    _addTodoItem();
-                  }
-                },
-                child: TextField(
-                  controller: _textController,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter a to-do item',
-                  ),
-                  textInputAction: TextInputAction.newline,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
+            children: [
+              // First Component - Two Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(onPressed: () {}, child: Text('ASK AI')),
+                  ElevatedButton(onPressed: () {}, child: Text('DIARY')),
+                ],
+              ),
+
+              SizedBox(height: 16), // Spacing
+
+              // Second Component - To-Do List with fixed height
+              Container(
+                height: 200, // Fixed height to prevent overflow
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("To-Do List",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _todoItems.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(title: Text(_todoItems[index]));
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _addTodoItem,
-                child: const Text('Add To-Do'),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _todoList.length,
-                  itemBuilder: (context, index) {
-                    return CheckboxListTile(
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(
-                        _todoList[index]['text'],
+
+              SizedBox(height: 16), // Spacing
+
+              // Third Component - Chat Area with fixed height
+              Container(
+                height: 300, // Fixed height to ensure space for chat input
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Chat with AI",
                         style: TextStyle(
-                          decoration: _todoList[index]['completed']
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                          color: _todoList[index]['completed']
-                              ? Colors.black.withOpacity(0.5)
-                              : Colors.black,
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _chatMessages.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Text(_chatMessages[index]),
+                          );
+                        },
+                      ),
+                    ),
+                    TextField(
+                      controller: _chatController,
+                      decoration: InputDecoration(
+                        hintText: "Type your message...",
+                        border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: _sendMessage,
                         ),
                       ),
-                      value: _todoList[index]['completed'],
-                      onChanged: (bool? value) {
-                        _toggleTodoItem(index);
-                      },
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
             ],
