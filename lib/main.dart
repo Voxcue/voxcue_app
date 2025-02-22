@@ -9,7 +9,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: Container(
+        color: const Color.fromRGBO(34, 39, 38, 1),
+        child: HomePage(),
+      ),
     );
   }
 }
@@ -38,7 +41,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('VOXCUE')),
+      appBar: AppBar(
+        title: const Text(
+          'VOXCUE',
+          style: TextStyle(
+            color: Colors.white, // White text color
+            fontSize: 20, // Adjust font size if needed
+            fontWeight: FontWeight.bold, // Optional: Makes text bold
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+      ),
+      backgroundColor: Color.fromRGBO(34, 39, 38, 255),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -49,8 +63,24 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(onPressed: () {}, child: Text('ASK AI')),
-                  ElevatedButton(onPressed: () {}, child: Text('DIARY')),
+                  ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(238, 158, 110,
+                            1), // Background color // Text and icon color
+                      ),
+                      child: Text(
+                        'ASK AI',
+                        style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
+                      )),
+                  ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(238, 158, 110, 1)),
+                      child: Text(
+                        'DIARY',
+                        style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
+                      )),
                 ],
               ),
 
@@ -61,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                 height: 200, // Fixed height to prevent overflow
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: const Color.fromRGBO(53, 56, 58, 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -69,13 +99,19 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text("To-Do List",
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
                         itemCount: _todoItems.length,
                         itemBuilder: (context, index) {
-                          return ListTile(title: Text(_todoItems[index]));
+                          return ListTile(
+                              title: Text(_todoItems[index],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  )));
                         },
                       ),
                     ),
@@ -90,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                 height: 300, // Fixed height to ensure space for chat input
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: const Color.fromRGBO(53, 56, 58, 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -98,7 +134,9 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text("Chat with AI",
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
@@ -113,11 +151,22 @@ class _HomePageState extends State<HomePage> {
                     ),
                     TextField(
                       controller: _chatController,
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
                       decoration: InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: const Color.fromARGB(200, 255, 255, 255),
+                              width: 2), // Active border
+                        ),
+                        hintStyle: TextStyle(
+                            color: const Color.fromARGB(163, 255, 255, 255)),
                         hintText: "Type your message...",
                         border: OutlineInputBorder(),
+                        fillColor: Colors.white,
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.send),
+                          icon: Icon(Icons.send,
+                              color: const Color.fromRGBO(238, 158, 110, 1)),
                           onPressed: _sendMessage,
                         ),
                       ),
