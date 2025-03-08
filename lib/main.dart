@@ -1,11 +1,19 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
+import 'package:voxcue_app/data/todo_items_data.dart';
+import 'package:voxcue_app/models/chat_message.dart';
+import 'package:voxcue_app/models/todo_modal.dart';
+import 'package:voxcue_app/services/api_services.dart';
 import 'diary_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,6 +27,8 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -27,11 +37,65 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _chatControllerAI = TextEditingController();
   final TextEditingController _chatController = TextEditingController();
   final List<String> _chatMessagesAI = [];
-  final List<String> _chatMessages = [];
-  final List<String> _todoItems = List.generate(
-      20, (index) => "Task ${index + 1}"); // Simulating large data
+  List<String> _chatMessages = [];
+  List<String> _todoItems = List.generate(
+      10, (index) => "Task ${index + 1}"); // Simulating large data
 
   bool _isChatVisible = false;
+
+  // @override             need to call when api call is available
+  // void initState() {
+  //   getMessages();
+  //   super.initState();
+  // }
+
+  //initial function to call to update the ui
+  void getMessages() async {
+    try {
+      List<ChatMessage> messages = await ApiService.fetchMessages();
+      print("Fetched Messages: $messages");
+      setState(() {
+        _chatMessages = messages
+            .map(
+              (e) => e.text,
+            )
+            .toList();
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  //function to send message to api
+  void sendMessage(ChatMessage newMessage) async {
+    try {
+      ChatMessage responseMessage = await ApiService.sendMessage(newMessage);
+
+      setState(() {
+        _chatMessages.add("User: ${newMessage.text}");
+        _chatMessages.add("AI: ${responseMessage.text}"); // Add AI response
+      });
+
+      print("Message sent successfully! Response: ${responseMessage.text}");
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> fetchTodoItems() async {
+    try {
+      List<TodoModal> todos = await ApiService.fetchTodos();
+      setState(() {
+        _todoItems = todos
+            .map(
+              (e) => e.title,
+            )
+            .toList();
+      });
+    } catch (e) {
+      print("Error fetching todos: $e");
+    }
+  }
 
   void _sendMessageAI() {
     if (_chatControllerAI.text.trim().isNotEmpty) {
@@ -71,7 +135,8 @@ class _HomePageState extends State<HomePage> {
         const end = Offset.zero;
         const curve = Curves.ease;
 
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),
@@ -95,7 +160,7 @@ class _HomePageState extends State<HomePage> {
         ),
         backgroundColor: Colors.transparent,
       ),
-      backgroundColor: Color.fromRGBO(34, 39, 38, 255),
+      backgroundColor: const Color.fromRGBO(34, 39, 38, 255),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -109,10 +174,10 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: _toggleChatVisibility,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromRGBO(238, 158, 110,
+                        backgroundColor: const Color.fromRGBO(238, 158, 110,
                             1), // Background color // Text and icon color
                       ),
-                      child: Text(
+                      child: const Text(
                         'ASK AI',
                         style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
                       )),
@@ -120,20 +185,20 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () => _navigateToDiaryPage(context),
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Color.fromRGBO(238, 158, 110, 1)),
-                      child: Text(
+                      child: const Text(
                         'DIARY',
                         style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
                       )),
                 ],
               ),
 
-              SizedBox(height: 16), // Spacing
+              const SizedBox(height: 16), // Spacing
 
               // Fourth Component - New Chat Area
               if (_isChatVisible)
                 Container(
                   height: 300, // Fixed height to ensure space for chat input
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: const Color.fromRGBO(53, 56, 58, 1),
                     borderRadius: BorderRadius.circular(10),
@@ -141,12 +206,12 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Chat with AI",
+                      const Text("Chat with AI",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold)),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Expanded(
                         child: ListView.builder(
                           itemCount: _chatMessagesAI.length,
@@ -161,22 +226,22 @@ class _HomePageState extends State<HomePage> {
                       ),
                       TextField(
                         controller: _chatControllerAI,
-                        style: TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white),
                         cursorColor: Colors.white,
                         decoration: InputDecoration(
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: const Color.fromARGB(200, 255, 255, 255),
+                                color: Color.fromARGB(200, 255, 255, 255),
                                 width: 2), // Active border
                           ),
-                          hintStyle: TextStyle(
-                              color: const Color.fromARGB(163, 255, 255, 255)),
+                          hintStyle: const TextStyle(
+                              color: Color.fromARGB(163, 255, 255, 255)),
                           hintText: "Type your message...",
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                           fillColor: Colors.white,
                           suffixIcon: IconButton(
-                            icon: Icon(Icons.send,
-                                color: const Color.fromRGBO(238, 158, 110, 1)),
+                            icon: const Icon(Icons.send,
+                                color: Color.fromRGBO(238, 158, 110, 1)),
                             onPressed: _sendMessageAI,
                           ),
                         ),
@@ -185,12 +250,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-              SizedBox(height: 16), // Spacing
+              const SizedBox(height: 16), // Spacing
 
               // Second Component - To-Do List with fixed height
               Container(
                 height: 200, // Fixed height to prevent overflow
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(53, 56, 58, 1),
                   borderRadius: BorderRadius.circular(10),
@@ -198,19 +263,19 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("To-Do List",
+                    const Text("To-Do List",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: _todoItems.length,
+                        itemCount: todoItems.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                              title: Text(_todoItems[index],
-                                  style: TextStyle(
+                              title: Text(todoItems[index],
+                                  style: const TextStyle(
                                     color: Colors.white,
                                   )));
                         },
@@ -220,12 +285,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              SizedBox(height: 16), // Spacing
+              const SizedBox(height: 16), // Spacing
 
               // Third Component - Chat Area with fixed height
               Container(
                 height: 300, // Fixed height to ensure space for chat input
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(53, 56, 58, 1),
                   borderRadius: BorderRadius.circular(10),
@@ -233,41 +298,44 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Chat Area",
+                    const Text("Chat Area",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
                         itemCount: _chatMessages.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Text(_chatMessages[index]),
+                            child: Text(
+                              _chatMessages[index],
+                              style: const TextStyle(color: Colors.white60),
+                            ),
                           );
                         },
                       ),
                     ),
                     TextField(
                       controller: _chatController,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide(
-                              color: const Color.fromARGB(200, 255, 255, 255),
+                              color: Color.fromARGB(200, 255, 255, 255),
                               width: 2), // Active border
                         ),
-                        hintStyle: TextStyle(
-                            color: const Color.fromARGB(163, 255, 255, 255)),
+                        hintStyle: const TextStyle(
+                            color: Color.fromARGB(163, 255, 255, 255)),
                         hintText: "Type your message...",
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         fillColor: Colors.white,
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.send,
-                              color: const Color.fromRGBO(238, 158, 110, 1)),
+                          icon: const Icon(Icons.send,
+                              color: Color.fromRGBO(238, 158, 110, 1)),
                           onPressed: _sendMessage,
                         ),
                       ),
