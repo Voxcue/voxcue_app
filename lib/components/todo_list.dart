@@ -59,7 +59,7 @@ class _TodoListState extends State<TodoList> {
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
                     color: _todoList[index]['completed']
-                        ? Colors.black.withOpacity(0.5)
+                        ? const Color.fromARGB(109, 13, 13, 13)
                         : Colors.black,
                   ),
                 ),
