@@ -5,23 +5,29 @@ import 'package:voxcue_app/data/todo_items_data.dart';
 import 'package:voxcue_app/models/chat_message.dart';
 import 'package:voxcue_app/models/todo_modal.dart';
 import 'package:voxcue_app/services/api_services.dart';
-import 'diary_page.dart';
+import 'package:voxcue_app/screens/login_screen.dart';
+import 'package:voxcue_app/screens/register_screen.dart';
+import 'package:voxcue_app/screens/home_page.dart'; // Assuming you have a home screen
+import 'screens/diary_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Container(
-        color: const Color.fromRGBO(34, 39, 38, 1),
-        child: HomePage(),
+      title: 'Voxcue App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => LoginScreen(),
+        '/register': (context) => RegisterScreen(),
+        '/home': (context) => HomePage(), // Use HomePage as the home screen
+      },
     );
   }
 }
@@ -34,32 +40,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final ApiService _apiService = ApiService();
   final TextEditingController _chatControllerAI = TextEditingController();
   final TextEditingController _chatController = TextEditingController();
   final List<String> _chatMessagesAI = [];
   List<String> _chatMessages = [];
-  List<String> _todoItems = List.generate(
-      10, (index) => "Task ${index + 1}"); // Simulating large data
+  List<String> _todoItems = [];
 
   bool _isChatVisible = false;
 
-  // @override             need to call when api call is available
-  // void initState() {
-  //   getMessages();
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    getMessages();
+    fetchTodoItems();
+  }
 
   //initial function to call to update the ui
   void getMessages() async {
     try {
-      List<ChatMessage> messages = await ApiService.fetchMessages();
+      List<ChatMessage> messages = await _apiService.fetchMessages();
       print("Fetched Messages: $messages");
       setState(() {
-        _chatMessages = messages
-            .map(
-              (e) => e.text,
-            )
-            .toList();
+        _chatMessages = messages.map((e) => e.text).toList();
       });
     } catch (e) {
       print("Error: $e");
@@ -69,13 +72,11 @@ class _HomePageState extends State<HomePage> {
   //function to send message to api
   void sendMessage(ChatMessage newMessage) async {
     try {
-      ChatMessage responseMessage = await ApiService.sendMessage(newMessage);
-
+      ChatMessage responseMessage = await _apiService.sendMessage(newMessage);
       setState(() {
         _chatMessages.add("User: ${newMessage.text}");
         _chatMessages.add("AI: ${responseMessage.text}"); // Add AI response
       });
-
       print("Message sent successfully! Response: ${responseMessage.text}");
     } catch (e) {
       print("Error: $e");
@@ -84,13 +85,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchTodoItems() async {
     try {
-      List<TodoModal> todos = await ApiService.fetchTodos();
+      List<TodoModal> todos = await _apiService.fetchTodos();
       setState(() {
-        _todoItems = todos
-            .map(
-              (e) => e.title,
-            )
-            .toList();
+        _todoItems = todos.map((e) => e.title).toList();
       });
     } catch (e) {
       print("Error fetching todos: $e");
@@ -271,10 +268,10 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: todoItems.length,
+                        itemCount: _todoItems.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                              title: Text(todoItems[index],
+                              title: Text(_todoItems[index],
                                   style: const TextStyle(
                                     color: Colors.white,
                                   )));
