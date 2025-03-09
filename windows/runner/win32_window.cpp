@@ -87,6 +87,7 @@ class WindowClassRegistrar {
 WindowClassRegistrar* WindowClassRegistrar::instance_ = nullptr;
 
 const wchar_t* WindowClassRegistrar::GetWindowClass() {
+  static const wchar_t* kWindowClassName = L"FLUTTER_RUNNER_WIN32_WINDOW";
   if (!class_registered_) {
     WNDCLASS window_class{};
     window_class.hCursor = LoadCursor(nullptr, IDC_ARROW);
@@ -104,6 +105,7 @@ const wchar_t* WindowClassRegistrar::GetWindowClass() {
     class_registered_ = true;
   }
   return kWindowClassName;
+
 }
 
 void WindowClassRegistrar::UnregisterWindowClass() {
