@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // App Icon
-                Icon(Icons.lock_outline, size: 80, color: Colors.white70),
+                const Icon(Icons.lock_outline, size: 80, color: Colors.white70),
                 const SizedBox(height: 20),
                 // App Name
                 const Text(
@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     color: const Color.fromRGBO(53, 56, 58, 1),
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 8,
