@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:voxcue_app/services/api_services.dart';
 import 'package:voxcue_app/models/chat_message.dart';
 import 'package:voxcue_app/models/todo_modal.dart';
+import 'package:voxcue_app/models/ai_response.dart';
 import 'diary_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,74 +18,65 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService();
   final TextEditingController _chatControllerAI = TextEditingController();
   final TextEditingController _chatController = TextEditingController();
+  final TextEditingController _todoController = TextEditingController();
   final List<String> _chatMessagesAI = [];
   List<String> _chatMessages = [];
-  List<String> _todoItems = [];
+  List<TodoModal> _todoItems = [];
 
   bool _isChatVisible = false;
 
   @override
   void initState() {
     super.initState();
-    getMessages();
     fetchTodoItems();
   }
 
-  //initial function to call to update the ui
-  void getMessages() async {
-    try {
-      List<ChatMessage> messages = await _apiService.fetchMessages();
-      print("Fetched Messages: $messages");
-      setState(() {
-        _chatMessages = messages.map((e) => e.text).toList();
-      });
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
-
-  //function to send message to api
-  void sendMessage(ChatMessage newMessage) async {
-    try {
-      ChatMessage responseMessage = await _apiService.sendMessage(newMessage);
-      setState(() {
-        _chatMessages.add("User: ${newMessage.text}");
-        _chatMessages.add("AI: ${responseMessage.text}"); // Add AI response
-      });
-      print("Message sent successfully! Response: ${responseMessage.text}");
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
 
   Future<void> fetchTodoItems() async {
     try {
-      List<TodoModal> todos = await _apiService.fetchTodos();
+      List<TodoModal> todos = await _apiService.getTodosForDate(DateTime.now().toIso8601String());
       setState(() {
-        _todoItems = todos.map((e) => e.title).toList();
+        _todoItems = todos;
       });
     } catch (e) {
       print("Error fetching todos: $e");
     }
   }
 
-  void _sendMessageAI() {
+  void _sendMessageAI() async {
     if (_chatControllerAI.text.trim().isNotEmpty) {
-      setState(() {
-        _chatMessagesAI.add("User: ${_chatControllerAI.text}");
-        _chatMessagesAI.add("AI: This is a sample response.");
-      });
-      _chatControllerAI.clear();
+      try {
+        AIResponse response = await _apiService.getAIResponse(_chatControllerAI.text);
+        setState(() {
+          _chatMessagesAI.add("User: ${_chatControllerAI.text}");
+          _chatMessagesAI.add("AI: ${response.answer}");
+        });
+        _chatControllerAI.clear();
+      } catch (e) {
+        print("Error getting AI response: $e");
+      }
     }
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_chatController.text.trim().isNotEmpty) {
-      setState(() {
-        _chatMessages.add("User: ${_chatController.text}");
-        _chatMessages.add("AI: This is a sample response.");
-      });
-      _chatController.clear();
+      try {
+        final response = await _apiService.postDiaryEntry(
+          _chatController.text,
+          DateTime.now().toIso8601String(),
+        );
+        setState(() {
+          _chatMessages.add("User: ${_chatController.text}");
+          if (response.containsKey('question')) {
+            _chatMessages.add("AI: ${response['question']}");
+          } else if (response.containsKey('message')) {
+            _chatMessages.add("AI: ${response['message']}");
+          }
+        });
+        _chatController.clear();
+      } catch (e) {
+        print("Error posting diary entry: $e");
+      }
     }
   }
 
@@ -116,6 +108,15 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
+  // void _addTodoItem() async {
+  //   try {
+  //     await _apiService.postTodoItem(DateTime.now().toIso8601String());
+  //     fetchTodoItems(); // Refresh the todo list
+  //   } catch (e) {
+  //     print("Error adding todo: $e");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +150,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: () => _navigateToDiaryPage(context),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromRGBO(238, 158, 110, 1)),
+                          backgroundColor: const Color.fromRGBO(238, 158, 110, 1)),
                       child: const Text(
                         'DIARY',
                         style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
@@ -232,18 +232,27 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("To-Do List",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text("To-Do List",
+                    //         style: TextStyle(
+                    //             color: Colors.white,
+                    //             fontSize: 18,
+                    //             fontWeight: FontWeight.bold)),
+                    //     IconButton(
+                    //       icon: const Icon(Icons.add, color: Color.fromRGBO(238, 158, 110, 1)),
+                    //       onPressed: _addTodoItem,
+                    //     ),
+                    //   ],
+                    // ),
                     const SizedBox(height: 8),
                     Expanded(
                       child: ListView.builder(
                         itemCount: _todoItems.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                              title: Text(_todoItems[index],
+                              title: Text(_todoItems[index].title,
                                   style: const TextStyle(
                                     color: Colors.white,
                                   )));
@@ -319,3 +328,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
