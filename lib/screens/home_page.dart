@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:voxcue_app/services/api_services.dart';
 import 'package:voxcue_app/models/chat_message.dart';
@@ -119,17 +121,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'VOXCUE',
-          style: TextStyle(
-            color: Colors.white, // White text color
-            fontSize: 20, // Adjust font size if needed
-            fontWeight: FontWeight.bold, // Optional: Makes text bold
-          ),
-        ),
-        backgroundColor: Colors.transparent,
+        title: const Text('VOXCUE', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromRGBO(34, 39, 38, 1),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      backgroundColor: const Color.fromRGBO(34, 39, 38, 255),
+      backgroundColor: const Color.fromRGBO(34, 39, 38, 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -153,7 +149,8 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: () => _navigateToDiaryPage(context),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromRGBO(238, 158, 110, 1)),
+                          backgroundColor:
+                              const Color.fromRGBO(238, 158, 110, 1)),
                       child: const Text(
                         'DIARY',
                         style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
@@ -188,7 +185,10 @@ class _HomePageState extends State<HomePage> {
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Text(_chatMessagesAI[index]),
+                              child: Text(
+                                _chatMessagesAI[index],
+                                style: const TextStyle(color: Colors.white60),
+                              ),
                             );
                           },
                         ),
