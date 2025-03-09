@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class DiaryPage extends StatelessWidget {
+  const DiaryPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,14 +17,14 @@ class DiaryPage extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
       ),
-      backgroundColor: Color.fromRGBO(34, 39, 38, 255),
+      backgroundColor: const Color.fromRGBO(34, 39, 38, 255),
       body: Container(
-        color: Color.fromRGBO(34, 39, 38, 255), // Ensure the background color is set
+        color: const Color.fromRGBO(34, 39, 38, 255), // Ensure the background color is set
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Diary Entries',
               style: TextStyle(
                 color: Colors.white,
@@ -30,7 +32,7 @@ class DiaryPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
                 itemCount: 10, // Example item count
@@ -38,14 +40,14 @@ class DiaryPage extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Container(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(53, 56, 58, 1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         'Diary Entry ${index + 1}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                         ),
                       ),
