@@ -5,7 +5,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -16,7 +16,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     try {
-      await _apiService.login(_usernameController.text, _passwordController.text);
+      await _apiService.login(
+          _usernameController.text, _passwordController.text);
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       setState(() {
@@ -62,6 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: const Text('Don\'t have an account? Register here'),
             ),
           ],
+
         ),
       ),
     );

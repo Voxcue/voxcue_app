@@ -8,14 +8,16 @@ class DiaryPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Diary',
+          'Diary Entries',
           style: TextStyle(
             color: Colors.white, // White text color
-            fontSize: 20, // Adjust font size if needed
-            fontWeight: FontWeight.bold, // Optional: Makes text bold
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromRGBO(34, 39, 38, 1),
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
       ),
       backgroundColor: const Color.fromRGBO(34, 39, 38, 255),
       body: Container(
@@ -35,15 +37,15 @@ class DiaryPage extends StatelessWidget {
             const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
-                itemCount: 10, // Example item count
+                itemCount: 100, // Example item count
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(53, 56, 58, 1),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         'Diary Entry ${index + 1}',

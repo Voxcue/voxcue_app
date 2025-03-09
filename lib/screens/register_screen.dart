@@ -16,7 +16,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _register() async {
     try {
-      await _apiService.register(_usernameController.text, _passwordController.text);
+      await _apiService.register(
+          _usernameController.text, _passwordController.text);
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
       setState(() {
