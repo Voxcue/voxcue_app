@@ -62,10 +62,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
-        color: Color.fromRGBO(32, 41, 85, 0.5),
+        color: const Color.fromRGBO(32, 41, 85, 0.5),
       ),
       child: Column(
         children: [
@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
         color:
-            Color.fromRGBO(32, 41, 85, 0.5), // Slightly darker for input area
+            const Color.fromRGBO(32, 41, 85, 0.5), // Slightly darker for input area
         border: Border(
           top: BorderSide(color: Colors.grey[200]!),
         ),

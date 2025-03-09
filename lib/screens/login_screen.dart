@@ -144,8 +144,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ],
+
             ),
-          ),
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _login,
+              child: const Text('Login'),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red),
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: _navigateToRegister,
+              child: const Text('Don\'t have an account? Register here'),
+            ),
+          ],
+
         ),
       ),
     );
