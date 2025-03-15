@@ -20,12 +20,13 @@ class _HomePageState extends State<HomePage> {
   final List<String> _chatMessagesAI = [];
   List<String> _chatMessages = [];
   List<String> _todoItems = [];
-
+  late DateTime _selectedDateTime;
   bool _isChatVisible = false;
 
   @override
   void initState() {
     super.initState();
+    _selectedDateTime = DateTime.now();
     getMessages();
     fetchTodoItems();
   }
@@ -95,12 +96,32 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _navigateToDiaryPage(BuildContext context) {
-    Navigator.of(context).push(_createRoute());
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) =>
+          DiaryPage(selectedDate: _selectedDateTime, changeDate: _changeDate),
+    ));
+    //Navigator.of(context).push(_createRoute());
+  }
+
+  void _changeDate(int days) {
+    final newDate = _selectedDateTime.add(Duration(days: days));
+    if (days > 0 && newDate.isAfter(DateTime.now())) {
+      return;
+    }
+    _selectedDateTime = newDate;
+    _fetchDataForDate();
+    setState(() {});
+  }
+
+  void _fetchDataForDate() async {
+    // Call API to fetch data based on _selectedDateTime
+    print("Fetching data for $_selectedDateTime");
   }
 
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => DiaryPage(),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          DiaryPage(selectedDate: _selectedDateTime, changeDate: _changeDate),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
@@ -121,40 +142,97 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VOXCUE', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color.fromRGBO(34, 39, 38, 1),
+        title: const Text(
+          'VOXCUE',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor:
+            const Color.fromRGBO(20, 25, 25, 1), // Dark theme color
         iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon:
+                const Icon(Icons.account_circle_outlined, color: Colors.white),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
       ),
-      backgroundColor: const Color.fromRGBO(34, 39, 38, 1),
+      backgroundColor: const Color.fromRGBO(20, 25, 25, 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           // Makes whole page scrollable
           child: Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_left_outlined,
+                      color: Colors.white,
+                      size: 38,
+                    ),
+                    onPressed: () => _changeDate(-1),
+                  ),
+                  const SizedBox(width: 30),
+                  Text(
+                    _selectedDateTime.year == DateTime.now().year &&
+                            _selectedDateTime.month == DateTime.now().month &&
+                            _selectedDateTime.day == DateTime.now().day
+                        ? "Today"
+                        : "${_selectedDateTime.toLocal()}"
+                            .split(' ')[0], // Formats date correctly
+                    style: const TextStyle(fontSize: 26, color: Colors.white),
+                  ),
+                  const SizedBox(width: 30),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_right_outlined,
+                      color: Colors.white,
+                      size: 38,
+                    ),
+                    onPressed: () => _changeDate(1),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 30),
+
               // First Component - Two Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                      onPressed: _toggleChatVisibility,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(238, 158, 110,
-                            1), // Background color // Text and icon color
-                      ),
-                      child: const Text(
-                        'ASK AI',
-                        style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
-                      )),
+                    onPressed: _toggleChatVisibility,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(238, 158, 110,
+                          1), // Background color // Text and icon color
+                    ),
+                    child: const Text(
+                      'ASK AI',
+                      style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
+                    ),
+                  ),
                   ElevatedButton(
-                      onPressed: () => _navigateToDiaryPage(context),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromRGBO(238, 158, 110, 1)),
-                      child: const Text(
-                        'DIARY',
-                        style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
-                      )),
+                    onPressed: () => _navigateToDiaryPage(context),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromRGBO(238, 158, 110, 1)),
+                    child: const Text(
+                      'DIARY',
+                      style: TextStyle(color: Color.fromRGBO(34, 39, 38, 1)),
+                    ),
+                  ),
                 ],
               ),
 
